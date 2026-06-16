@@ -1,0 +1,9 @@
+{{- if .Values.ingress.enabled }}
+OpenLaunch ingress is enabled.
+Host: {{ .Values.ingress.host }}
+{{- else }}
+OpenLaunch is installed without ingress. Use port-forward to test:
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "openlaunch.fullname" . }} 3000:{{ .Values.service.port }}
+{{- end }}
+
+Health endpoint: /api/health

@@ -1,0 +1,21 @@
+{
+  "name": "@openlaunch/launch-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "openlaunch-launch-server": "dist/index.js"
+  },
+  "scripts": {
+    "typecheck": "npm run typecheck -w @openlaunch/core && tsc --noEmit",
+    "build": "npm run build -w @openlaunch/core && tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@openlaunch/core": "0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.0",
+    "typescript": "^5.6.3"
+  }
+}

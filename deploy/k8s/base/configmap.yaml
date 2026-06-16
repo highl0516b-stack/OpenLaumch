@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openlaunch-config
+  namespace: openlaunch
+  labels:
+    app.kubernetes.io/name: openlaunch
+    app.kubernetes.io/component: web
+    app.kubernetes.io/part-of: openlaunch
+data:
+  NODE_ENV: "production"
+  PORT: "3000"
+  HOSTNAME: "0.0.0.0"
+  NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+  OPENLAUNCH_MCP_MODE: "sandbox"
+  OPENLAUNCH_TENANT_ID: "default"
+  OPENLAUNCH_AI_PROVIDER: "local"
+  OPENLAUNCH_ALLOWED_PATHS: "/app"
+  OPENLAUNCH_FILE_ROOT: "/app"

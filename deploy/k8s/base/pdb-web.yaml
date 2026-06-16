@@ -1,0 +1,15 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: openlaunch-web
+  namespace: openlaunch
+  labels:
+    app.kubernetes.io/name: openlaunch
+    app.kubernetes.io/component: web
+    app.kubernetes.io/part-of: openlaunch
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: openlaunch
+      app.kubernetes.io/component: web
