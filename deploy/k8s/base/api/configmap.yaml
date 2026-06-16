@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openlaunch-api-config
+  labels:
+    app.kubernetes.io/name: openlaunch-api
+data:
+  NODE_ENV: "production"
+  PORT: "4000"
+  HOSTNAME: "0.0.0.0"
+  OPENLAUNCH_MCP_MODE: "sandbox"

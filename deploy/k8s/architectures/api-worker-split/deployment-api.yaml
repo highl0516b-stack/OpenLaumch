@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: openlaunch-api
-  namespace: openlaunch-dev
   labels:
     app.kubernetes.io/name: openlaunch
     app.kubernetes.io/component: api

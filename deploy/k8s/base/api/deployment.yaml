@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openlaunch-api
+  labels:
+    app.kubernetes.io/name: openlaunch-api
+    app.kubernetes.io/component: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: openlaunch-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: openlaunch-api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "4000"
+        prometheus.io/path: "/api/health"
+    spec:
+      containers:
+        - name: api
+          image: openlaunch-api:local
+          ports:
+            - containerPort: 4000
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: "4000"
+            - name: HOSTNAME
+              value: "0.0.0.0"
+            - name: OPENLAUNCH_MCP_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: openlaunch-api-config
+                  key: OPENLAUNCH_MCP_MODE
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 4000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 4000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi

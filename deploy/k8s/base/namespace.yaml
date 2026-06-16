@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openlaunch
-  labels:
-    app.kubernetes.io/name: openlaunch
-    app.kubernetes.io/part-of: openlaunch

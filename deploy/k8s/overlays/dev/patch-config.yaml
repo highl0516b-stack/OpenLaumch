@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: openlaunch-config
-data:
-  NEXT_PUBLIC_APP_URL: "https://dev.openlaunch.example.com"
-  OPENLAUNCH_TENANT_ID: "dev"
-  OPENLAUNCH_MCP_MODE: "sandbox"

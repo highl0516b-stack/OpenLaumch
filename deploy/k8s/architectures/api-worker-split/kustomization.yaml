@@ -1,13 +1,52 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+
 namespace: openlaunch-dev
+
 resources:
-  - ../../overlays/dev
+  - ../../base/web
+  - ../../base/api
+  - ../../shared
   - deployment-api.yaml
   - service-api.yaml
   - networkpolicy-api.yaml
-images:
-  - name: openlaunch-api:local
-    newTag: dev
+
 patches:
-  - path: patch-ingress.yaml
+  # Route /api to API service, all else to Web
+  - target:
+      kind: Ingress
+      name: openlaunch-web
+    patch: |-
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: openlaunch-web
+        annotations:
+          nginx.ingress.kubernetes.io/rewrite-target: /$2
+      spec:
+        ingressClassName: nginx
+        rules:
+          - http:
+              paths:
+                - path: /api(/|$)(.*)
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: openlaunch-api
+                      port:
+                        number: 80
+                - path: /(.*)
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: openlaunch-web
+                      port:
+                        number: 80
+
+images:
+  - name: openlaunch
+    newName: ghcr.io/highl0516b-stack/openlaunch
+    newTag: dev
+  - name: openlaunch-api
+    newName: ghcr.io/highl0516b-stack/openlaunch-api
+    newTag: dev

@@ -1,6 +1,0 @@
-apiVersion: policy/v1
-kind: PodDisruptionBudget
-metadata:
-  name: openlaunch-web
-spec:
-  minAvailable: 2

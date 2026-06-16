@@ -1,13 +1,94 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+
 namespace: openlaunch-dev
+
 resources:
-  - ../../base
-images:
-  - name: openlaunch:local
-    newTag: dev
+  - ../../base/web
+  - ../../base/api
+  - ../../shared
+
 patches:
-  - path: patch-config.yaml
-  - path: patch-deployment.yaml
-  - path: patch-ingress.yaml
-  - path: patch-hpa.yaml
+  # Web ConfigMap
+  - target:
+      kind: ConfigMap
+      name: openlaunch-web-config
+    patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: openlaunch-web-config
+      data:
+        NEXT_PUBLIC_APP_URL: "https://dev.openlaunch.example.com"
+        OPENLAUNCH_TENANT_ID: "dev"
+        OPENLAUNCH_MCP_MODE: "sandbox"
+  # Web Deployment
+  - target:
+      kind: Deployment
+      name: openlaunch-web
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: openlaunch-web
+      spec:
+        replicas: 2
+        template:
+          spec:
+            containers:
+              - name: web
+                imagePullPolicy: IfNotPresent
+                resources:
+                  requests:
+                    cpu: 150m
+                    memory: 192Mi
+                  limits:
+                    cpu: 750m
+                    memory: 768Mi
+  # Web HPA
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: openlaunch-web
+    patch: |-
+      apiVersion: autoscaling/v2
+      kind: HorizontalPodAutoscaler
+      metadata:
+        name: openlaunch-web
+      spec:
+        minReplicas: 2
+        maxReplicas: 6
+  # Web Ingress
+  - target:
+      kind: Ingress
+      name: openlaunch-web
+    patch: |-
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: openlaunch-web
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-staging
+      spec:
+        tls:
+          - hosts:
+              - dev.openlaunch.example.com
+            secretName: openlaunch-dev-tls
+        rules:
+          - host: dev.openlaunch.example.com
+            http:
+              paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: openlaunch-web
+                      port:
+                        number: 80
+
+images:
+  - name: openlaunch
+    newName: ghcr.io/highl0516b-stack/openlaunch
+    newTag: dev
+  - name: openlaunch-api
+    newName: ghcr.io/highl0516b-stack/openlaunch-api
+    newTag: dev
