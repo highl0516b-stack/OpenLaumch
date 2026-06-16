@@ -1,0 +1,53 @@
+# Cloudflare 架構部署手冊 - OpenLaunch
+
+## 整體架構
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                    Cloudflare 生態架構                        │
+│                                                              │
+│  Pages (靜態/SSR) → Workers (邏輯層) → Wrangler (CLI)       │
+│                        │                                     │
+│          ┌────────────┼────────────┐                         │
+│          ▼            ▼            ▼                         │
+│   ┌──────────┐ ┌──────────┐ ┌──────────┐                   │
+│   │  Durable │ │   D1     │ │    KV    │                   │
+│   │  Objects │ │ (SQLite) │ │(Key-Val) │                   │
+│   └─────┬────┘ └─────┬────┘ └─────┬────┘                   │
+│         │            │            │                         │
+│   ┌─────▼─────┐ ┌────▼────┐ ┌────▼─────┐                   │
+│   │WebSocket/ │ │ R2      │ │ Vectorize│                   │
+│   │ State     │ │(物件儲存)│ │(向量搜尋) │                   │
+│   └───────────┘ └─────────┘ └──────────┘                   │
+│                                                              │
+│   Queues(佇列) + Cron(排程) + Workflows(持久流程)            │
+│                                                              │
+│   Logpush → Datadog/Grafana/Axiom → 集中式日誌              │
+│   Workers AI + AI Gateway → LLM 推理                        │
+└──────────────────────────────────────────────────────────────┘
+```
+
+## 環境對照
+
+| 層級 | 技術 | 用途 |
+|------|------|------|
+| 靜態/SSR | Pages / Assets | Landing page、靜態資源 |
+| 邏輯層 | Workers (JS/TS/WASM) | API、路由、中介軟體 |
+| AI 推理 | Workers AI + AI Gateway | LLM、圖像、嵌入向量 |
+| 會話/狀態 | Durable Objects + WebSocket | Agent 狀態、多人協作 |
+| 結構化資料 | D1 (SQLite) | 用戶、Leads、配置 |
+| 鍵值快取 | KV | Session、Config 快取 |
+| 檔案儲存 | R2 | 上傳檔案、備份 |
+| 向量搜尋 | Vectorize | 語意搜尋、RAG |
+| 訊息佇列 | Queues | 異步任務、事件驅動 |
+| 排程 | Cron Triggers | 定期清理、報告 |
+| 長流程 | Workflows | 多步驟 durable 任務 |
+| 加速 | Hyperdrive | 外部 DB 查詢加速 |
+| 日誌 | Logpush + Analytics | 集中式日誌、監控 |
+
+## 核心原則
+
+- **JDD**：每個 Worker 都有明確的 job 和 acceptance criteria
+- **KISS**：一個 Worker 只做一件事，模組化解耦
+- **DRY**：共用 bindings、utility functions
+- **LOG**：所有 Worker 統一 JSON log 格式，帶 request ID

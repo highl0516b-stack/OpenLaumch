@@ -1,0 +1,30 @@
+{
+  "config:global": {
+    "site_name": "OpenLaunch",
+    "site_url": "https://openlaunch.example.com",
+    "api_url": "https://api.openlaunch.example.com",
+    "maintenance": false
+  },
+  "config:limits": {
+    "max_requests_per_minute": 60,
+    "max_tokens_per_request": 4096,
+    "max_concurrent_sessions": 100
+  },
+  "config:mcp_modes": {
+    "sandbox": {
+      "write_enabled": false,
+      "max_tool_calls": 10,
+      "allowed_tools": ["fetch_text","fetch_json","memory_get","memory_list","git_status","git_diff"]
+    },
+    "production": {
+      "write_enabled": true,
+      "max_tool_calls": 100,
+      "allowed_tools": ["*"]
+    }
+  },
+  "config:models": {
+    "default_llm": "openai/gpt-4.1-mini",
+    "default_embedding": "openai/text-embedding-3-small",
+    "max_context_length": 16384
+  }
+}
