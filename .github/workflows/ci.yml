@@ -1,0 +1,170 @@
+name: CI - Build & Smoke
+
+on:
+  push:
+    branches:
+      - master
+      - main
+      - develop
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOCKER_BUILDKIT: 1
+  WAIT_HTTP_TIMEOUT_MS: 90000
+  WAIT_HTTP_INTERVAL_MS: 1500
+
+jobs:
+  secret-scan:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan repository for leaked secrets
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/repo" \
+            zricethezav/gitleaks:latest detect \
+            --source=/repo \
+            --redact
+
+  dockerfile-lint:
+    name: Dockerfile lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Lint Dockerfile
+        run: docker run --rm -i hadolint/hadolint:latest < Dockerfile
+
+      - name: Lint API Dockerfile
+        run: docker run --rm -i hadolint/hadolint:latest < Dockerfile.api
+
+  build-web-smoke:
+    name: Build web image and smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build web image with BuildKit cache
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          load: true
+          tags: openlaunch:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run web container
+        run: |
+          docker rm -f openlaunch-web-smoke >/dev/null 2>&1 || true
+          docker run -d \
+            --name openlaunch-web-smoke \
+            -p 3000:3000 \
+            -e NODE_ENV=production \
+            -e PORT=3000 \
+            -e HOSTNAME=0.0.0.0 \
+            -e OPENLAUNCH_MCP_MODE=sandbox \
+            openlaunch:ci
+
+      - name: Wait for web health
+        run: node scripts/wait-for-http.mjs http://127.0.0.1:3000/api/health
+
+      - name: Scan web image
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image \
+            --severity HIGH,CRITICAL \
+            --exit-code 1 \
+            openlaunch:ci
+
+      - name: Cleanup web container
+        if: always()
+        run: docker rm -f openlaunch-web-smoke >/dev/null 2>&1 || true
+
+  build-api-smoke:
+    name: Build API image and smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build API image with BuildKit cache
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.api
+          load: true
+          tags: openlaunch-api:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run API container
+        run: |
+          docker rm -f openlaunch-api-smoke >/dev/null 2>&1 || true
+          docker run -d \
+            --name openlaunch-api-smoke \
+            -p 4000:4000 \
+            -e NODE_ENV=production \
+            -e PORT=4000 \
+            -e HOSTNAME=0.0.0.0 \
+            -e OPENLAUNCH_MCP_MODE=sandbox \
+            openlaunch-api:ci
+
+      - name: Wait for API health
+        run: node scripts/wait-for-http.mjs http://127.0.0.1:4000/api/health
+
+      - name: Scan API image
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image \
+            --severity HIGH,CRITICAL \
+            --exit-code 1 \
+            openlaunch-api:ci
+
+      - name: Cleanup API container
+        if: always()
+        run: docker rm -f openlaunch-api-smoke >/dev/null 2>&1 || true
+
+  k8s-render:
+    name: Render Kubernetes manifests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Render base manifests
+        run: npm run k8s:build:base
+
+      - name: Render local overlay
+        run: npm run k8s:build:local
+
+      - name: Render dev overlay
+        run: npm run k8s:build:dev
+
+      - name: Render prod overlay
+        run: npm run k8s:build:prod
+
+      - name: Render split API architecture
+        run: npm run k8s:build:split-api

@@ -2,14 +2,15 @@
 
 FROM node:20-alpine AS base
 WORKDIR /app
-ENV CI=true
+ENV CI=true \
+    NEXT_TELEMETRY_DISABLED=1
 
 FROM base AS deps
 COPY package.json package-lock.json* ./
 COPY apps/web/package.json apps/web/package.json
 COPY packages/core/package.json packages/core/package.json
 COPY packages/mcp-servers/launch-server/package.json packages/mcp-servers/launch-server/package.json
-RUN npm ci || npm install
+RUN --mount=type=cache,target=/root/.npm npm ci || npm ci
 
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
