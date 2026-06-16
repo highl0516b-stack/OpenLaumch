@@ -1,0 +1,7 @@
+name = "openlaunch-queue-worker"
+main = "workers/queue-worker/src/index.ts"
+compatibility_date = "2024-12-01"
+
+[queues]
+producer = "QUEUE_SENDER"
+consumer = "QUEUE_CONSUMER"

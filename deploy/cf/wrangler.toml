@@ -1,0 +1,4 @@
+# OpenLaunch - Cloudflare 根配置
+name = "openlaunch-root"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
