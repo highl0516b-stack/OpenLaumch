@@ -1,12 +1,8 @@
 # OpenLaunch
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 OpenLaunch 是 **Launch as a Service / Launch OS** 原型平台：把一個產品想法轉成 landing page、waitlist、全網 launch copy、lead segments、investor one-pager 與 30 天持續跟進計劃。
-
-## 產品定位
-
-- 研討會、產品演練、演說集資、社群聚客、資方引進。
-- 一鍵生成 launch pack，預留全網分發、CRM、MCP、資料室與投資者儀表板接口。
-- Magic Moment：輸入一句話產品描述，10 分鐘內得到 launch command center。
 
 ## 快速開始
 
@@ -17,27 +13,98 @@ npm install
 cp .env.example .env.local
 # 編輯 .env.local 後啟動
 npm run dev
+npm run dev:api
 ```
 
 開啟：<http://localhost:3000>
 
 ## 主要指令
 
+| 指令 | 說明 |
+|---|---|
+| `npm run dev` | 啟動 Next.js dev server |
+| `npm run dev:api` | 啟動 Node.js API server |
+| `npm run build` | 建立 production build |
+| `npm run typecheck` | TypeScript 檢查 |
+| `npm run lint` | ESLint |
+| `npm run docker:build` | Build web image |
+| `npm run docker:build:api` | Build API image |
+| `npm run docker:build:fast` | Build web image（BuildKit cache，最高速度） |
+| `npm run docker:build:api:fast` | Build API image（BuildKit cache，最高速度） |
+| `npm run docker:up` | Docker Compose 起服務（web + API） |
+| `npm run docker:down` | Docker Compose 停止 |
+| `npm run docker:smoke:wait <url>` | 等候 HTTP health endpoint |
+| `npm run k8s:build:local` | Render K8s local manifests |
+| `npm run k8s:build:dev` | Render K8s dev manifests |
+| `npm run k8s:build:prod` | Render K8s prod manifests |
+| `npm run k8s:build:split-api` | Render split API architecture |
+
+## 部署方式
+
+### ① Docker Compose（最快，適合開發 / Demo）
+
 ```bash
-npm run dev        # 啟動 Next.js dev server
-npm run dev:api    # 啟動 Node.js API server
-npm run build      # 建立 production build
-npm run typecheck  # TypeScript 檢查
-npm run lint       # ESLint
-npm run debug:graph # 生成代碼圖譜，並用 Mermaid.ink CDN 渲染成 1 張 PNG
-powershell .\debug-run.ps1 # 執行 DEBUG：安裝依賴並生成 .tmp/openlaunch-code-graph.png
-npm run docker:build
-npm run docker:build:api
-npm run docker:up
-npm run k8s:build:local
-npm run k8s:build:dev
-npm run k8s:build:prod
+npm run docker:up          # build + run web (3000) + api (4000)
+npm run docker:down        # 停止
+npm run docker:build:fast  # 快速 build web image
+npm run docker:build:api:fast  # 快速 build API image
+npm run docker:smoke:wait http://127.0.0.1:3000/api/health
+npm run docker:smoke:wait http://127.0.0.1:4000/api/health
 ```
+
+### ② Docker Buildx Bake（CI / 正式 build，支援 BuildKit cache）
+
+```bash
+docker buildx bake --load
+```
+
+一次 build 兩個 image（web + API）。第二次 build 極快，因為 npm cache 會保留。
+
+### ③ Kind + K8s 本地演練（模擬真實 K8s 部署）
+
+```bash
+# 預備：安裝 kind、kubectl、docker
+./scripts/kind-local-demo.sh                 # web 模式
+./scripts/kind-local-demo.sh MODE=split      # split API 模式（Web + 獨立 API pod）
+```
+
+也可逐步執行：
+
+```bash
+kind create cluster --name openlaunch-local --config deploy/k8s/kind.yaml
+docker build -t openlaunch:local .
+docker build -f Dockerfile.api -t openlaunch-api:local .
+kind load docker-image openlaunch:local --name openlaunch-local
+kind load docker-image openlaunch-api:local --name openlaunch-local
+kubectl apply -k deploy/k8s/overlays/local
+kubectl -n openlaunch-local port-forward svc/openlaunch-web 3000:80
+```
+
+### ④ Kubernetes 正式部署（多租戶 / Production）
+
+```bash
+# 1. Build image
+docker build -t ghcr.io/highl0516b-stack/openlaunch:prod .
+docker build -f Dockerfile.api -t ghcr.io/highl0516b-stack/openlaunch-api:prod .
+
+# 2. Push
+docker push ghcr.io/highl0516b-stack/openlaunch:prod
+docker push ghcr.io/highl0516b-stack/openlaunch-api:prod
+
+# 3. 修改 K8s overlay 的 image tag
+#    deploy/k8s/overlays/prod/kustomization.yaml 中把 image tag 改為 prod
+
+# 4. Deploy（需事先安裝 cert-manager + ingress-nginx + metrics-server）
+kubectl apply -k deploy/k8s/overlays/prod
+kubectl -n openlaunch-prod rollout status deploy/openlaunch-web
+kubectl -n openlaunch-prod rollout status deploy/openlaunch-api
+```
+
+## 產品定位
+
+- 研討會、產品演練、演說集資、社群聚客、資方引進。
+- 一鍵生成 launch pack，預留全網分發、CRM、MCP、資料室與投資者儀表板接口。
+- Magic Moment：輸入一句話產品描述，10 分鐘內得到 launch command center。
 
 ## 目錄結構
 
