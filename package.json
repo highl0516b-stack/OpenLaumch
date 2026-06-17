@@ -1,0 +1,35 @@
+{
+  "name": "openlaunch",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Launch as a Service platform: AI-native launch command center with MCP-ready tool adapters.",
+  "workspaces": [
+    "apps/**",
+    "packages/**"
+  ],
+  "scripts": {
+    "predev": "npm run build -w @openlaunch/core && npm run build -w @openlaunch/launch-server",
+    "dev": "npm run dev -w @openlaunch/web",
+    "dev:api": "npm run dev -w @openlaunch/api",
+    "build": "npm run build -w @openlaunch/core && npm run build -w @openlaunch/launch-server && npm run build -w @openlaunch/api && npm run build -w @openlaunch/web",
+    "typecheck": "npm run typecheck -w @openlaunch/core && npm run typecheck -w @openlaunch/launch-server && npm run typecheck -w @openlaunch/api && npm run typecheck -w @openlaunch/web",
+    "lint": "npm run lint -w @openlaunch/web",
+    "debug:graph": "node scripts/generate-code-graph.mjs",
+    "docker:build": "docker build -t openlaunch:local .",
+    "docker:build:api": "docker build -f Dockerfile.api -t openlaunch-api:local .",
+    "docker:build:fast": "docker build --progress=plain -t openlaunch:local .",
+    "docker:build:api:fast": "docker build --progress=plain -f Dockerfile.api -t openlaunch-api:local .",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:smoke:wait": "node scripts/wait-for-http.mjs",
+    "k8s:build:base": "kubectl kustomize deploy/k8s/base",
+    "k8s:build:local": "kubectl kustomize deploy/k8s/overlays/local",
+    "k8s:build:dev": "kubectl kustomize deploy/k8s/overlays/dev",
+    "k8s:build:prod": "kubectl kustomize deploy/k8s/overlays/prod",
+    "k8s:build:split-api": "kubectl kustomize deploy/k8s/architectures/api-worker-split"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "npm@10.8.2"
+}

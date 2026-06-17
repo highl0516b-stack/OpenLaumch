@@ -1,0 +1,15 @@
+name = "openlaunch-gateway"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+NODE_ENV = "production"
+RATE_LIMIT_MAX_REQUESTS = "100"
+RATE_LIMIT_WINDOW_MS = "60000"
+ALLOWED_ORIGINS = ""
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "8c8ecdd2edf5405a96f6a0cced993d42"
