@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openlaunch-api-config
+  namespace: openlaunch
+data:
+  PORT: "4000"
+  HOSTNAME: "0.0.0.0"
+  OPENLAUNCH_TENANT_ID: "default"
+  OPENLAUNCH_MCP_MODE: "production"
+  OPENLAUNCH_ALLOWED_PATHS: "/api/mcp/tools,/api/mcp/tools/call,/api/launch/generate,/api/integration-status,/api/webhooks"
+  API_RATE_LIMIT_WINDOW_MS: "60000"
+  API_RATE_LIMIT_MAX_CALLS: "60"
+  API_MAX_BODY_BYTES: "1000000"
