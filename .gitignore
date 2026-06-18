@@ -6,7 +6,15 @@ dist
 build
 .next
 .wrangler
+*.tsbuildinfo
 logs
 *.log
+artifacts/
+!artifacts/
+!artifacts/at-wfy-001/
+!artifacts/at-wfy-001/market-journal.md
+!artifacts/at-wfy-001-last-run.json
+!artifacts/case-reports/
+!artifacts/case-reports-last-run.json
 .DS_Store
 Thumbs.db

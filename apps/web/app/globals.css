@@ -1,0 +1,345 @@
+:root {
+  color-scheme: dark;
+  --black: #05070a;
+  --black-2: #090d14;
+  --black-3: #0d131d;
+  --navy: #101a2b;
+  --navy-2: #16233a;
+  --gold: #c8a95f;
+  --gold-2: #e0c77d;
+  --text: #e8edf4;
+  --muted: #9aa7b8;
+  --line: rgba(200, 169, 95, 0.18);
+  --panel: rgba(16, 26, 43, 0.72);
+  --radius: 24px;
+  --max: 1180px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--black);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(200, 169, 95, 0.12), transparent 34rem),
+    radial-gradient(circle at 80% 10%, rgba(16, 26, 43, 0.9), transparent 32rem),
+    linear-gradient(180deg, var(--black) 0%, var(--black-2) 42%, var(--black) 100%);
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.page-shell,
+.site-shell {
+  width: min(var(--max), calc(100% - 32px));
+  margin: 0 auto;
+  padding: 18px 0 112px;
+}
+
+.hero,
+.section {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(145deg, rgba(16, 26, 43, 0.58), rgba(5, 7, 10, 0.68));
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+  padding: clamp(24px, 6vw, 56px);
+  margin: 28px 0;
+  overflow: hidden;
+}
+
+.hero {
+  display: grid;
+  gap: 22px;
+}
+
+.hero-copy,
+.section-heading {
+  position: relative;
+  z-index: 1;
+}
+
+.eyebrow,
+.section-kicker {
+  margin: 0 0 10px;
+  color: var(--gold);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+h1 {
+  max-width: 16ch;
+  margin: 0 0 18px;
+  font-size: clamp(2.35rem, 10vw, 5.8rem);
+  line-height: 0.92;
+  letter-spacing: -0.08em;
+}
+
+h2 {
+  margin: 0 0 12px;
+  font-size: clamp(1.7rem, 5vw, 3.2rem);
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+h3 {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+}
+
+p {
+  color: var(--muted);
+}
+
+.hero-subtitle {
+  max-width: 62ch;
+  margin-bottom: 24px;
+  font-size: clamp(1rem, 2.2vw, 1.22rem);
+}
+
+.hero-actions,
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.button,
+.mini-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 16px;
+  color: var(--text);
+  background: rgba(16, 26, 43, 0.72);
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.button:hover,
+.mini-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(200, 169, 95, 0.5);
+}
+
+.button.primary,
+.mini-button {
+  color: #101218;
+  border-color: rgba(224, 199, 125, 0.9);
+  background: linear-gradient(135deg, var(--gold), var(--gold-2));
+  font-weight: 800;
+}
+
+.button.secondary {
+  background: rgba(5, 7, 10, 0.34);
+}
+
+.hero-card,
+.grid {
+  display: grid;
+  gap: 14px;
+}
+
+.metric-row,
+.card {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(5, 7, 10, 0.26);
+  padding: 16px;
+}
+
+.metric-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.metric-row span {
+  color: var(--gold);
+  font-size: 1.4rem;
+  font-weight: 900;
+}
+
+.metric-row small,
+.card p {
+  color: var(--muted);
+}
+
+.section-heading {
+  max-width: 760px;
+  margin-bottom: 24px;
+}
+
+.grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.channel-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.channel-pill {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(5, 7, 10, 0.32);
+  color: var(--text);
+}
+
+.magic-form {
+  display: grid;
+  gap: 18px;
+}
+
+.magic-form label,
+.magic-form fieldset {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px;
+  background: rgba(5, 7, 10, 0.24);
+}
+
+.magic-form textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  color: var(--text);
+  background: rgba(5, 7, 10, 0.42);
+}
+
+.magic-form legend {
+  color: var(--gold);
+  font-weight: 800;
+}
+
+.channel-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+}
+
+.magic-output {
+  white-space: pre-wrap;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px;
+  color: var(--text);
+  background: rgba(5, 7, 10, 0.36);
+}
+
+.form-note {
+  margin: 0;
+}
+
+.journal-page {
+  width: min(var(--max), calc(100% - 32px));
+  margin: 0 auto;
+  padding: 18px 0 112px;
+}
+
+.journal-shell {
+  display: block;
+}
+
+.journal-hero-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.journal-card {
+  overflow: auto;
+}
+
+.journal-content {
+  color: var(--text);
+  line-height: 1.72;
+}
+
+.journal-content h1,
+.journal-content h2,
+.journal-content h3 {
+  color: var(--text);
+}
+
+.journal-content p,
+.journal-content li {
+  color: var(--muted);
+}
+
+.journal-content blockquote {
+  border-left: 3px solid var(--gold);
+  margin: 18px 0;
+  padding: 8px 16px;
+  color: var(--text);
+  background: rgba(200, 169, 95, 0.08);
+}
+
+.journal-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 18px 0;
+  font-size: 0.9rem;
+}
+
+.journal-content th,
+.journal-content td {
+  border: 1px solid var(--line);
+  padding: 10px;
+  vertical-align: top;
+}
+
+.journal-content th {
+  color: var(--gold);
+  background: rgba(200, 169, 95, 0.08);
+}
+
+.journal-content code {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 2px 6px;
+  color: var(--gold-2);
+  background: rgba(5, 7, 10, 0.42);
+}
+
+.journal-empty {
+  border: 1px dashed var(--line);
+  border-radius: 18px;
+  padding: 24px;
+  color: var(--text);
+  background: rgba(5, 7, 10, 0.28);
+}

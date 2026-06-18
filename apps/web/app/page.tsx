@@ -19,6 +19,7 @@ export default function Home() {
           <div className="hero-actions">
             <a className="button primary" href="#magic">立即生成 launch pack</a>
             <a className="button secondary" href="#architecture">查看技術架構</a>
+            <a className="button secondary" href="/at-wfy-001">查看 AI/API 市場日誌</a>
           </div>
         </div>
         <div className="hero-card">

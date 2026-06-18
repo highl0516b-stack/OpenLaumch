@@ -1,0 +1,56 @@
+name: AT-WFY-001 Market Journal
+
+on:
+  schedule:
+    - cron: "17 */3 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Force a report even if the 3-day cadence has not elapsed"
+        required: false
+        type: boolean
+        default: false
+      special:
+        description: "Publish an extra special report without resetting the routine cadence"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Generate AT-WFY-001 report
+        run: npm run agents:wfy
+        env:
+          AT_WFY_001_FORCE: ${{ inputs.force && '1' || '0' }}
+          AT_WFY_001_SPECIAL: ${{ inputs.special && '1' || '0' }}
+
+      - name: Generate startup case reports
+        run: npm run agents:cases
+
+      - name: Commit AT-WFY-001 report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts/at-wfy-001-market-journal.md artifacts/at-wfy-001-last-run.json artifacts/case-reports artifacts/case-reports-last-run.json
+          if git diff --cached --quiet; then
+            echo "No AT-WFY-001 changes to commit."
+          else
+            git commit -m "docs: publish AT-WFY-001 market journal"
+            git push
+          fi

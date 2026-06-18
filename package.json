@@ -13,6 +13,8 @@
     "dev:api": "npm run dev -w @openlaunch/api",
     "build": "npm run build -w @openlaunch/core && npm run build -w @openlaunch/launch-server && npm run build -w @openlaunch/api && npm run build -w @openlaunch/web",
     "typecheck": "npm run typecheck -w @openlaunch/core && npm run typecheck -w @openlaunch/launch-server && npm run typecheck -w @openlaunch/api && npm run typecheck -w @openlaunch/web",
+    "agents:wfy": "node scripts/agents/wfy-001-agent.mjs",
+    "agents:cases": "node scripts/agents/case-report-agent.mjs",
     "lint": "npm run lint -w @openlaunch/web",
     "debug:graph": "node scripts/generate-code-graph.mjs",
     "docker:build": "docker build -t openlaunch:local .",

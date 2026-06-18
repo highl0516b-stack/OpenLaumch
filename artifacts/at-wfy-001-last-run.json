@@ -1,0 +1,14 @@
+{
+  "id": "AT-WFY-001",
+  "cadenceHours": 3,
+  "lastRunAt": "2026-06-18T18:54:28.453Z",
+  "lastRoutineRunAt": "2026-06-18T18:54:28.453Z",
+  "nextRoutineDueAt": "2026-06-18T21:54:28.453Z",
+  "lastReportPath": "artifacts/at-wfy-001/market-journal.md",
+  "lastSourceCount": 13,
+  "lastSourceDiversity": 3,
+  "lastFailureCount": 0,
+  "packageName": "openlaunch",
+  "packageVersion": "0.1.0",
+  "updatedAt": "2026-06-18T18:54:28.453Z"
+}
